@@ -17,14 +17,25 @@ app.post('/blogs', (req, res) => {
 app.put('/posts/:title', (req, res) => {
   const {title} = req.params;
   const {content} = req.body;
-  console.log(content, title);
 
-  if (!title || !content) {
-    res.status(400).send('Title and content are required.');
+  if (!content) {
+    res.status(400).send('Content is required.');
     return;
 }
   if (fs.existsSync(title)) {
     fs.writeFileSync(title, content);
+    res.end('ok')
+  }
+  else {
+    res.status(404).send('This post does not exist!');
+  }
+})
+
+app.delete('/blogs/:title', (req, res) => {
+  const {title} = req.params;
+
+  if (fs.existsSync(title)) {
+    fs.unlinkSync(title);
     res.end('ok')
   }
   else {
