@@ -10,8 +10,26 @@ app.post('/blogs', (req, res) => {
         res.status(400).send('Title and content are required.');
         return;
     }
-  fs.writeFileSync(title, content);
+  fs.writeFileSync(title.split(' ').join('-'), content);
   res.end('ok')
+})
+
+app.put('/posts/:title', (req, res) => {
+  const {title} = req.params;
+  const {content} = req.body;
+  console.log(content, title);
+
+  if (!title || !content) {
+    res.status(400).send('Title and content are required.');
+    return;
+}
+  if (fs.existsSync(title)) {
+    fs.writeFileSync(title, content);
+    res.end('ok')
+  }
+  else {
+    res.status(404).send('This post does not exist!');
+  }
 })
  
 
