@@ -54,6 +54,22 @@ app.get('/blogs/:title', (req, res) => {
     res.status(404).send('This post does not exist!');
   }
 })
+
+app.get('/blogs', (req, res) => {
+  const selectedBlogPosts = []
+  const titles = req.body
+  titles.forEach((title) => {
+    const blogTitle = title.title.split(' ').join('-')
+    console.log(blogTitle);
+    const post = fs.readFileSync(blogTitle, 'utf8');
+    const blogPost = {
+      title: title.title,
+      content: post
+    }
+    selectedBlogPosts.push(blogPost);
+  })
+  res.send(selectedBlogPosts);
+})
  
 
 // YOUR CODE GOES IN HERE
