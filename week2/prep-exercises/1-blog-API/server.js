@@ -59,13 +59,20 @@ app.get('/blogs', (req, res) => {
   const selectedBlogPosts = []
   const titles = req.body
   titles.forEach((title) => {
+    let blogPost = {}
     const blogTitle = title.title.split(' ').join('-')
-    console.log(blogTitle);
+    if (!fs.existsSync(blogTitle)){
+      blogPost = {
+        title: title.title,
+        content: "No blog post with this title"
+      }
+    } else {
     const post = fs.readFileSync(blogTitle, 'utf8');
-    const blogPost = {
+    blogPost = {
       title: title.title,
       content: post
     }
+  }
     selectedBlogPosts.push(blogPost);
   })
   res.send(selectedBlogPosts);
