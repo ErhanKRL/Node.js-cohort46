@@ -42,6 +42,18 @@ app.delete('/blogs/:title', (req, res) => {
     res.status(404).send('This post does not exist!');
   }
 })
+
+app.get('/blogs/:title', (req, res) => {
+  const {title} = req.params;
+
+  if (fs.existsSync(title)) {
+    const post = fs.readFileSync(title);
+    res.end(post)
+  }
+  else {
+    res.status(404).send('This post does not exist!');
+  }
+})
  
 
 // YOUR CODE GOES IN HERE
