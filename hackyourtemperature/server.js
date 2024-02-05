@@ -22,8 +22,7 @@ app.post('/weather', async (req, res) => {
       return res.status(404).json({ weatherText: "City is not found!" });
     }
     const temperature = data.main.temp;
-    return res.status(200).json({ weatherText: `Temperature in ${cityName}: ${temperature}°C` });
-    console.log(data);
+    return res.status(200).json({ weatherText: `${cityName}: ${temperature}°C` });
   } catch(error){
     console.log("Error fetching weather data:", error);
     return res.status(500).json({ error: "Internal Server Error" });
