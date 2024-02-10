@@ -40,7 +40,7 @@ const registerUser = async (username, password) => {
   return newUser;
 }
 
-//Register User
+//Register User Endpoint
 app.post('/register', async(req, res) => {
   const {username, password} = req.body;
   if (!username || !password) {
@@ -54,7 +54,7 @@ app.post('/register', async(req, res) => {
   }
 })
 
-//Login user
+//Login User Endpoint
 app.post('/login', async (req, res) => {
   const {username, password} = req.body;
   if (!username || !password) {
@@ -71,6 +71,32 @@ app.post('/login', async (req, res) => {
   } catch (error){
     res.status(500).json({message: 'Internal Server Error'});
   }
+})
+
+//Get Profile Endpoint
+app.get('/profile', (req, res) => {
+  const autHeader = req.headers.authorization;
+  if(!autHeader || !autHeader.startsWith('Bearer ')){
+    res.json(401).json({message: 'Invalid Token'});
+  }
+  const token = autHeader.substring(7);
+  try{
+    const decodedToken = jwt.verify(token, JWT_SECRET_KEY);
+    const userId = decodedToken.id;
+    const users = readUsers();
+    const user = users.find(user => user.id === userId);
+    if(!user){
+      return res.status(404).json({message: 'User not found'});
+    }
+    res.status(200).json({user: user.username});
+  } catch (error) {
+    res.status(401).json({message:'invalid login credentials'});
+  }
+})
+
+//Logout Endpoint
+app.post('/logout', (req, res) => {
+  res.status(204).end('Logged Out!');
 })
 
 app.get('/', function (req, res) {
