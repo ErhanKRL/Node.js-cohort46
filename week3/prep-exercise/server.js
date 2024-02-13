@@ -66,7 +66,7 @@ app.post('/login', async (req, res) => {
     if(!user || !(await bcrypt.compare( password, user.password))) {
       return res.status(401).json({ message: 'Invalid username or password' });
     }
-    const token = jwt.sign({id: user.id}, JWT_SECRET_KEY);
+    const token = jwt.sign({id: user.id}, JWT_SECRET_KEY, {expiresIn: '1h'});
     res.status(200).json({ token: token, message: 'Login Successful' });
   } catch (error){
     res.status(500).json({message: 'Internal Server Error'});
@@ -81,22 +81,27 @@ app.get('/profile', (req, res) => {
   }
   const token = autHeader.substring(7);
   try{
-    const decodedToken = jwt.verify(token, JWT_SECRET_KEY);
-    const userId = decodedToken.id;
-    const users = readUsers();
-    const user = users.find(user => user.id === userId);
-    if(!user){
-      return res.status(404).json({message: 'User not found'});
-    }
-    res.status(200).json({user: user.username});
+    jwt.verify(token, JWT_SECRET_KEY, (err, decoded) => {
+      if(err){
+        res.status(401).json({message:'Invalid Token'});
+        return
+      }
+      const userId = decoded.id;
+      const users = readUsers();
+      const user = users.find(user => user.id === userId);
+      if(!user){
+        return res.status(404).json({message: 'User not found'});
+      }
+      res.status(200).json({user: user.username})
+    });
   } catch (error) {
-    res.status(401).json({message:'invalid login credentials'});
+    res.status(500).json({message:'Internal Server Error'});
   }
 })
 
 //Logout Endpoint
 app.post('/logout', (req, res) => {
-  res.status(204).end('Logged Out!');
+  res.status(204).end();
 })
 
 app.get('/', function (req, res) {
